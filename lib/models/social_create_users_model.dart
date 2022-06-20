@@ -15,15 +15,13 @@ class Create_User_model{
     required this.Cover_Image,
     required this.profile_image,
     required this.Bio,
-
-
 });
 
 
   Create_User_model.fromJson(Map<String,dynamic>?json){
     email=json? ['email'];
     phone=json? ['phone'];
-    name=json? ['phone'];
+    name=json? ['name'];
     uId=json? ['uId'];
     Bio=json? ['Bio'];
     Cover_Image=json? ['Cover_Image'];

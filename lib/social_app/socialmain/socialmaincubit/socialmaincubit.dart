@@ -27,6 +27,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
 
     FirebaseFirestore.instance.collection('User1').doc(uId).get().then((value) {
       model = Create_User_model.fromJson(value.data());
+      print(model.profile_image);
       emit(MainGetDataSuccess());
     }).catchError((error) {
       print(error.toString());
@@ -67,8 +68,10 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (PickedFile != null) {
       profileImage = File(pickedFile!.path);
+      emit(Changeprofilesuccess());
     } else {
       print('No Image Selected');
+      emit(Changeprofileerror());
     }
   }
 
@@ -78,91 +81,83 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (PickedFile != null) {
       coverImage = File(pickedFile!.path);
-      emit(Changeprofilesuccess());
+      emit(Changecoversuccess());
     } else {
       print('No Image Selected');
-      emit(Changeprofileerror());
+      emit(Changecovererror());
     }
   }
 
-  String? profileImageURL;
-
   void UploadProfileImage() {
+    emit(updateProfileindecator());
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('Users/${Uri.file(profileImage!.path).pathSegments.last}')
         .putFile(profileImage!)
         .then((value) {
       value.ref.getDownloadURL().then((value) {
-        profileImageURL = value;
+        model.profile_image = value;
+        FirebaseFirestore.instance
+            .collection('User1')
+            .doc(model.uId)
+            .update(model.toMap())
+            .then((value) {
+          getUserData();
+        }).catchError((error) {});
         emit(ProfileUploadSuccessful());
       }).catchError((error) {
         emit(ProfileUploadError());
       });
-    }).catchError((errro) {
+    }).catchError((error) {
       emit(ProfileUploadError());
     });
   }
 
-  String? coverImageURL;
-
   void UploadCoverImage() {
+    emit(updateCoverindecator());
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('Users/${Uri.file(coverImage!.path).pathSegments.last}')
         .putFile(coverImage!)
         .then((value) {
       value.ref.getDownloadURL().then((value) {
-        coverImageURL = value;
+        model.Cover_Image = value;
+        FirebaseFirestore.instance
+            .collection('User1')
+            .doc(model.uId)
+            .update(model.toMap())
+            .then((value) {
+          getUserData();
+        }).catchError((error) {
+          print(error.toString());
+        });
         emit(ProfileUploadSuccessful());
       }).catchError((error) {
         emit(ProfileUploadError());
       });
-    }).catchError((errro) {
+    }).catchError((error) {
       emit(ProfileUploadError());
     });
   }
 
-  void UpdateUserImages() {
-    model = Create_User_model(
-      Cover_Image: '${coverImage??model.Cover_Image}',
-      name: '${model.name}',
-      uId: '${model.uId}',
-      phone: '${model.phone}',
-      email: '${model.email}',
-      profile_image: '${coverImage??model.profile_image}',
-      Bio: '${model.Bio}',
-    );
-    if (coverImage != null) {
-      FirebaseFirestore.instance
-          .collection('User1')
-          .doc(model.uId)
-          .update(model.toMap())
-          .then((value) {})
-          .catchError((error) {});
-    } else if (profileImage != null) {
-      FirebaseFirestore.instance
-          .collection('User1')
-          .doc(model.uId)
-          .update(model.toMap())
-          .then((value) {})
-          .catchError((error) {});
-    }else if (coverImage != null && profileImage != null ){
-      FirebaseFirestore.instance
-          .collection('User1')
-          .doc(model.uId)
-          .update(model.toMap())
-          .then((value) {})
-          .catchError((error) {});
-    }
-  }
-
-  void UpdateUserData() {
+  void UpdateUserData({
+    required String Name,
+    required String Bio,
+    required String phone,
+  }) {
+    emit(updateUserindecator());
+    model.name = Name;
+    model.Bio = Bio;
+    model.phone = phone;
     FirebaseFirestore.instance
         .collection('User1')
         .doc(model.uId)
         .update(model.toMap())
-        .then((value) {})
-        .catchError((error) {});
+        .then((value) {
+      getUserData();
+    }).catchError((error) {
+      print(error.toString());
+    });
+
   }
 }

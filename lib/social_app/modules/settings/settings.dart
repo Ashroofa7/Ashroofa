@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialapp/Components/components.dart';
-import 'package:socialapp/social_app/modules/editPost/editPost.dart';
+import 'package:socialapp/social_app/modules/editPost/editProfile.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmaincubit.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmainstates.dart';
 
@@ -14,11 +16,16 @@ class Setti extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         var c = SocialMainCubit.get(context).model;
+        var x = SocialMainCubit.get(context);
+        File? profile = x.profileImage;
+        File? cover = x.coverImage;
         return Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
+                if (state is updateProfileindecator) LinearProgressIndicator(),
+                if (state is updateCoverindecator) LinearProgressIndicator(),
                 Container(
                   height: 220,
                   width: double.infinity,
@@ -37,9 +44,11 @@ class Setti extends StatelessWidget {
                             ),
                           ),
                           image: DecorationImage(
-                            image: NetworkImage(
-                              '${c.Cover_Image}',
-                            ),
+                            image: cover == null
+                                ? NetworkImage(
+                                    '${c.Cover_Image}',
+                                  )
+                                : FileImage(cover) as ImageProvider,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -47,7 +56,9 @@ class Setti extends StatelessWidget {
                           alignment: Alignment.bottomRight,
                           child: IconButton(
                             splashRadius: Material.nullSplashRadius1,
-                            onPressed: () {},
+                            onPressed: () {
+                              x.getcoverimage();
+                            },
                             icon: CircleAvatar(
                               backgroundColor: Colors.grey[200],
                               child: Icon(Icons.camera_alt),
@@ -62,9 +73,11 @@ class Setti extends StatelessWidget {
                           radius: 63,
                           child: CircleAvatar(
                             radius: 60,
-                            child: Image(
-                              image: NetworkImage(c.profile_image),
-                            ),
+                            backgroundImage: profile == null
+                                ? NetworkImage(
+                                    '${c.profile_image}',
+                                  )
+                                : FileImage(profile) as ImageProvider,
                           ),
                         ),
                       ),
@@ -74,7 +87,9 @@ class Setti extends StatelessWidget {
                           alignment: Alignment.bottomCenter,
                           child: IconButton(
                             splashRadius: Material.nullSplashRadius1,
-                            onPressed: () {},
+                            onPressed: () {
+                              x.getprofileimage();
+                            },
                             icon: CircleAvatar(
                               backgroundColor: Colors.grey[200],
                               child: Icon(Icons.camera_alt),
@@ -82,10 +97,24 @@ class Setti extends StatelessWidget {
                             ),
                           ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
+                if (state is Changeprofilesuccess)
+                  defaultButton(() {
+                    x.UploadProfileImage();
+                  }, 'Update Profile')
+                else if (state is Changecoversuccess)
+                  defaultButton(
+                    () {
+                      x.UploadCoverImage();
+                    },
+                    'Update Cover',
+                  ),
                 SizedBox(
                   height: 10,
                 ),
@@ -97,8 +126,8 @@ class Setti extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  'Write your Bio...',
-                  style: Theme.of(context).textTheme.caption,
+                  '${c.Bio}',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(
                   height: 10,

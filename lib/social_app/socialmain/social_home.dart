@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialapp/Components/components.dart';
 import 'package:socialapp/Shared/Local/sharedpreferences.dart';
+import 'package:socialapp/social_app/social_login_cubit/cubitt/Social_States.dart';
 import 'package:socialapp/social_app/social_login_cubit/social_login_screen.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmaincubit.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmainstates.dart';
@@ -19,6 +20,7 @@ class Social_home extends StatelessWidget {
       listener: (context, state) {
         if (state is New_Post)
           Navigateto(context, NewPost());
+
       },
       builder: (context, state) {
         var c = SocialMainCubit.get(context);

@@ -348,11 +348,13 @@ Widget defaultwidthButton(VoidCallback? fun,
 Widget defaultButton(VoidCallback? fun,
     String text, {
       double size = 15,
+      double? width,
     }) =>
     Container(
+      width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
+        color: Colors.pinkAccent,
       ),
       child: MaterialButton(
         child: Text(
