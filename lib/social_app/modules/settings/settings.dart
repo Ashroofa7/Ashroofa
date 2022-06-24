@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialapp/Components/components.dart';
-import 'package:socialapp/social_app/modules/editPost/editProfile.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmaincubit.dart';
 import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmainstates.dart';
+
+import '../editProfile/editProfile.dart';
 
 class Setti extends StatelessWidget {
   const Setti({Key? key}) : super(key: key);

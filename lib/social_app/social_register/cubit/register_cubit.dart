@@ -57,6 +57,7 @@ class RegisterSocial extends Cubit<RegisterSocialStates> {
       profile_image:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/1200px-Circle-icons-profile.svg.png',
       Bio:'Write Your Bio...',
 
+
     );
 
     FirebaseFirestore.instance

@@ -46,7 +46,7 @@ class Myapp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (BuildContext context) => SocialMainCubit()..getUserData(),
+          create: (BuildContext context) => SocialMainCubit()..getUserData()..Getposts(),
         ),
       ],
       child: MaterialApp(

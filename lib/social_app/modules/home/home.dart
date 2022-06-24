@@ -1,27 +1,40 @@
+import 'package:conditional_builder/conditional_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:socialapp/models/post_model.dart';
+import 'package:socialapp/social_app/socialmain/socialmaincubit/socialmaincubit.dart';
+
+import '../../socialmain/socialmaincubit/socialmainstates.dart';
 
 class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => Posts(),
-          itemCount: 10,
-        ),
-      ),
-    );
+    return BlocConsumer<SocialMainCubit, SocialMainStates>(
+        listener: (context, state) {},
+        builder: (context, state) {
+        var x = SocialMainCubit.get(context).posts;
+          return Scaffold(
+            backgroundColor: Colors.grey[300],
+            body: ConditionalBuilder(condition: x.isNotEmpty,
+                builder:(context)=> SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) => Posts(x[index],context),
+                      itemCount: x.length,
+                    ),
+                  )           ,
+            fallback:(context)=> Center(child: const CircularProgressIndicator()),),
+          );
+        });
   }
 }
 
-Widget Posts() => Padding(
+Widget Posts(Create_Post_Model model,context) => Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
@@ -32,6 +45,7 @@ Widget Posts() => Padding(
               color: Colors.white,
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -42,7 +56,7 @@ Widget Posts() => Padding(
                         radius: 20,
                         child: Image(
                           image: NetworkImage(
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/1200px-Circle-icons-profile.svg.png',
+                            model.profileimage,
                           ),
                         ),
                       ),
@@ -58,7 +72,7 @@ Widget Posts() => Padding(
                                 Row(
                                   children: [
                                     Text(
-                                      'Mohamed Ashraf',
+                                      '${model.name}',
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
@@ -73,11 +87,12 @@ Widget Posts() => Padding(
                                   //crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      'June 2 ar 5:55 PM .',
+                                      '${model.datetime}',
                                       style: TextStyle(
                                           fontSize: 10,
                                           color: Colors.grey[600]),
                                     ),
+                                    SizedBox(width: 3,),
                                     Icon(
                                       Icons.star,
                                       size: 15,
@@ -96,17 +111,27 @@ Widget Posts() => Padding(
                             icon: Icon(
                               Icons.more_horiz,
                             ),
-                          )
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
+                const SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text('${model.text}',style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),),
+                ),
+                SizedBox(height: 10,),
+                if(model.post_Image != "")
                 Card(
                   elevation: 2,
                   child: Image(
                     image: NetworkImage(
-                      'https://ik.imagekit.io/ionicfirebaseapp/getflutter/tr:dpr-auto,tr:w-auto/2020/01/GFCards@2x-1.png',
+                      '${model.post_Image}',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -183,7 +208,7 @@ Widget Posts() => Padding(
                         radius: 20,
                         child: Image(
                           image: NetworkImage(
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Circle-icons-profile.svg/1200px-Circle-icons-profile.svg.png',
+                            '${SocialMainCubit.get(context).model.profile_image}',
                           ),
                         ),
                       ),
@@ -222,7 +247,6 @@ Widget Posts() => Padding(
               ],
             ),
           ),
-
         ],
       ),
     );

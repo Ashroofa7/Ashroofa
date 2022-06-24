@@ -3,23 +3,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-Widget defaultTextFiled({required TextEditingController controllerr,
-  required TextInputType type,
-  VoidCallback? suffixpresed,
-  ValueChanged<String>? change,
-  ValueChanged? submit,
-  bool ispassword = true,
-  required FormFieldValidator<String>? valid,
-  OutlineInputBorder? border,
-  IconData? suffix,
-  IconData? prefix,
-  required String label,
-  Color? color1,
-  Color? color2,
-  double radius = 0.0,
-  required FontWeight fontw,
-  required double fonts,
-  TextStyle? style}) =>
+Widget defaultTextFiled(
+        {required TextEditingController controllerr,
+        required TextInputType type,
+        VoidCallback? suffixpresed,
+        ValueChanged<String>? change,
+        ValueChanged? submit,
+        bool ispassword = true,
+        required FormFieldValidator<String>? valid,
+        OutlineInputBorder? border,
+        IconData? suffix,
+        IconData? prefix,
+        required String label,
+        Color? color1,
+        Color? color2,
+        double radius = 0.0,
+        required FontWeight fontw,
+        required double fonts,
+        TextStyle? style}) =>
     TextFormField(
       style: style,
       keyboardType: type,
@@ -38,11 +39,11 @@ Widget defaultTextFiled({required TextEditingController controllerr,
         ),
         suffixIcon: suffix != null
             ? IconButton(
-          icon: Icon(
-            suffix,
-          ),
-          onPressed: suffixpresed,
-        )
+                icon: Icon(
+                  suffix,
+                ),
+                onPressed: suffixpresed,
+              )
             : null,
         label: Text(
           label,
@@ -119,8 +120,7 @@ Widget defaultTextFiled({required TextEditingController controllerr,
 //   } ,
 // );
 
-Widget BuildBusiness(list, context) =>
-    InkWell(
+Widget BuildBusiness(list, context) => InkWell(
       onDoubleTap: () {
         // Navigateto(context, Web(list['url'],),);
       },
@@ -152,10 +152,7 @@ Widget BuildBusiness(list, context) =>
                     Expanded(
                       child: Text(
                         '${list['title']}',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .bodyText1,
+                        style: Theme.of(context).textTheme.bodyText1,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -176,33 +173,27 @@ Widget BuildBusiness(list, context) =>
       ),
     );
 
-Future Navigateto(context, widget) =>
-    Navigator.push(
+Future Navigateto(context, widget) => Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => widget),
     );
 
-Future Navigateandfinish(context, widget) =>
-    Navigator.pushAndRemoveUntil(
+Future Navigateandfinish(context, widget) => Navigator.pushAndRemoveUntil(
         context, MaterialPageRoute(builder: (context) => widget), (route) {
       return false;
     });
 
-Widget Articlebuilder(list, context, {isshared = false}) =>
-    ConditionalBuilder(
+Widget Articlebuilder(list, context, {isshared = false}) => ConditionalBuilder(
       condition: list.length > 0,
-      builder: (context) =>
-          ListView.separated(
-              physics: BouncingScrollPhysics(),
-              itemBuilder: (context, index) =>
-                  BuildBusiness(list[index], context),
-              separatorBuilder: (context, index) =>
-                  SizedBox(
-                    width: 10,
-                  ),
-              itemCount: 10),
+      builder: (context) => ListView.separated(
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (context, index) => BuildBusiness(list[index], context),
+          separatorBuilder: (context, index) => SizedBox(
+                width: 10,
+              ),
+          itemCount: 10),
       fallback: (context) =>
-      isshared ? Container() : Center(child: CircularProgressIndicator()),
+          isshared ? Container() : Center(child: CircularProgressIndicator()),
     );
 
 // Widget Businesstok(art, context) => InkWell(
@@ -268,8 +259,7 @@ Widget Articlebuilder(list, context, {isshared = false}) =>
 //       ),
 //     );
 
-Widget Mydivider() =>
-    Padding(
+Widget Mydivider() => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
         width: double.infinity,
@@ -325,10 +315,11 @@ Color enumcolor(ToastsState state) {
 
 String token = "";
 
-Widget defaultwidthButton(VoidCallback? fun,
-    String text, {
-      double size = 25,
-    }) =>
+Widget defaultwidthButton(
+  VoidCallback? fun,
+  String text, {
+  double size = 25,
+}) =>
     Container(
       width: double.infinity,
       height: 50,
@@ -345,11 +336,12 @@ Widget defaultwidthButton(VoidCallback? fun,
       ),
     );
 
-Widget defaultButton(VoidCallback? fun,
-    String text, {
-      double size = 15,
-      double? width,
-    }) =>
+Widget defaultButton(
+  VoidCallback? fun,
+  String text, {
+  double size = 15,
+  double? width,
+}) =>
     Container(
       width: width,
       decoration: BoxDecoration(
@@ -369,3 +361,31 @@ Widget defaultButton(VoidCallback? fun,
     );
 
 String uId = "";
+
+AppBar defaultAppBar({
+  IconData? iconB,
+  IconData? iconLe,
+  Text? text,
+  Text? textB,
+  VoidCallback? onpA,
+  VoidCallback? onpLe,
+}) =>
+    AppBar(
+      actions: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: MaterialButton(
+            onPressed: onpA,
+            child: textB,
+          ),
+        ),
+      ],
+      title: text,
+      leading: IconButton(
+        onPressed: onpLe,
+        icon: Icon(iconLe),
+      ),
+    );

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socialapp/Components/components.dart';
+import 'package:socialapp/models/post_model.dart';
 import 'package:socialapp/models/social_create_users_model.dart';
 import 'package:socialapp/social_app/modules/friends/friends.dart';
 import 'package:socialapp/social_app/modules/home/home.dart';
@@ -21,13 +22,14 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
   static SocialMainCubit get(context) => BlocProvider.of(context);
 
   late Create_User_model model;
+  late Create_Post_Model postmodel;
 
+  //get user data
   void getUserData() {
     emit(MainGetDataLoading());
 
     FirebaseFirestore.instance.collection('User1').doc(uId).get().then((value) {
       model = Create_User_model.fromJson(value.data());
-      print(model.profile_image);
       emit(MainGetDataSuccess());
     }).catchError((error) {
       print(error.toString());
@@ -37,6 +39,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
 
   int currentindex = 0;
 
+  //title list
   List<String> titles = [
     'News Feed',
     'Chats',
@@ -44,6 +47,8 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     'Friends',
     'Settings',
   ];
+
+  // widget of bottom nav list
   List<Widget> Screens = [
     Home(),
     Chat(),
@@ -51,7 +56,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     Friends(),
     Setti(),
   ];
-
+  //change bottom sheet
   void changeIndex(int index) {
     if (index == 2)
       emit(New_Post());
@@ -61,9 +66,9 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     emit(ChangeBottomNav());
   }
 
+  // get profile image
   File? profileImage;
   var picker = ImagePicker();
-
   Future<void> getprofileimage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (PickedFile != null) {
@@ -75,8 +80,8 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     }
   }
 
+//  get cover image
   File? coverImage;
-
   Future<void> getcoverimage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (PickedFile != null) {
@@ -88,6 +93,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     }
   }
 
+// upload profile image
   void UploadProfileImage() {
     emit(updateProfileindecator());
     firebase_storage.FirebaseStorage.instance
@@ -113,6 +119,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     });
   }
 
+// uplad cover image
   void UploadCoverImage() {
     emit(updateCoverindecator());
     firebase_storage.FirebaseStorage.instance
@@ -140,6 +147,7 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     });
   }
 
+  // update user data
   void UpdateUserData({
     required String Name,
     required String Bio,
@@ -158,6 +166,110 @@ class SocialMainCubit extends Cubit<SocialMainStates> {
     }).catchError((error) {
       print(error.toString());
     });
-
   }
+
+  //get post image
+  File? postImage;
+  Future<void> getpostimage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (PickedFile != null) {
+      postImage = File(pickedFile!.path);
+      emit(postImageUploadsuccess());
+    } else {
+      print('No Image Selected');
+      emit(postImageUploaderror());
+    }
+  }
+
+  //remove post image
+  void RemovePostImage (){
+    postImage=null;
+    emit(closepostImage());
+  }
+
+  //create post with image
+  void CreatePostwithImage({
+    required String datetime,
+    required String text,
+  }) {
+    postmodel = Create_Post_Model(
+      uId: model.uId,
+      datetime: datetime,
+      text: text,
+      post_Image: '',
+      name: model.name,
+      profileimage: model.profile_image,
+    );
+    emit(LoadingCreatepost());
+
+    firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('Posts/${Uri.file(postImage!.path).pathSegments.last}')
+        .putFile(postImage!)
+        .then((value) {
+      value.ref.getDownloadURL().then((value) {
+        postmodel.post_Image = value;
+        FirebaseFirestore.instance
+            .collection('Posts')
+            .doc()
+            .set(postmodel.toMap())
+            .then((value) {
+          Createpost(datetime: datetime, text: text);
+        }).catchError((error) {
+          print(error.toString());
+        });
+        emit(PostUploadSuccessful());
+      }).catchError((error) {
+        emit(PostUploadError());
+      });
+    }).catchError((error) {
+      emit(ProfileUploadError());
+    });
+  }
+
+ // create post
+  void Createpost({
+    required String text,
+    required String datetime,
+  }) {
+    postmodel = Create_Post_Model(
+      uId: model.uId,
+      datetime: datetime,
+      text: text,
+      profileimage:model.profile_image,
+      post_Image: postImage==null?"":postImage as String,
+      name: model.name,
+    );
+    emit(LoadingCreatepost());
+    FirebaseFirestore.instance
+        .collection('Posts')
+        .add(postmodel.toMap())
+        .then((value) {
+          emit(PostUploadSuccessful());
+    })
+        .catchError((error) {
+      print(error.toString());
+      emit(PostUploadError());
+    });
+  }
+
+  // get posts
+  List posts = [];
+
+void Getposts(){
+  FirebaseFirestore.instance
+      .collection('Posts')
+      .get()
+      .then((value) {
+        for (var element in value.docs) {
+          posts.add(Create_Post_Model.fromJson(element.data()));
+        }
+
+        emit(GetPostsSuccessful());
+
+  }).catchError((error){
+    print(error.toString());
+        emit(GetPostsError());
+  });
+}
 }
